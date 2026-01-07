@@ -516,6 +516,7 @@
       <button id="prevBtn" class="tool-button disabled">←</button>
       <button id="nextBtn" class="tool-button">→</button>
 
+
       <button id="penBtn" class="tool-button circle">✏️</button>
       <button id="greenBtn" class="tool-button circle">🟢</button>
       <button id="redBtn" class="tool-button circle">🔴</button>
@@ -542,6 +543,7 @@
 
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
 
     const timerWidget = document.getElementById('timerWidget');
     const timerDisplay = document.getElementById('timerDisplay');
@@ -1099,6 +1101,52 @@ const slides = [
       if (e.key === 'ArrowRight') { e.preventDefault(); changeSlideTo(currentSlide + 1); }
     });
 
+    function isFullscreen() {
+  return !!document.fullscreenElement;
+}
+
+async function enterFullscreen() {
+  const el = document.documentElement; // the whole page
+
+  if (el.requestFullscreen) {
+    await el.requestFullscreen();
+  } else if (el.webkitRequestFullscreen) {
+    await el.webkitRequestFullscreen(); // older Safari
+  }
+}
+
+async function exitFullscreen() {
+  if (document.exitFullscreen) {
+    await document.exitFullscreen();
+  } else if (document.webkitExitFullscreen) {
+    await document.webkitExitFullscreen(); // older Safari
+  }
+}
+
+async function toggleFullscreen() {
+  try {
+    if (isFullscreen()) {
+      await exitFullscreen();
+    } else {
+      await enterFullscreen();
+    }
+  } catch (err) {
+    console.warn("Fullscreen failed:", err);
+  }
+}
+
+fullscreenBtn.addEventListener('click', toggleFullscreen);
+
+function updateFullscreenUI() {
+  const on = isFullscreen();
+  fullscreenBtn.classList.toggle('active', on);
+  fullscreenBtn.textContent = on ? "⤡" : "⤢";
+}
+
+document.addEventListener('fullscreenchange', updateFullscreenUI);
+document.addEventListener('webkitfullscreenchange', updateFullscreenUI); // older Safari
+updateFullscreenUI();
+
     /* ============================================================
       DRAWING SYSTEM (per-slide persistence)
     ============================================================ */
@@ -1446,3 +1494,4 @@ const slides = [
   </script>
 </body>
 </html>
+
