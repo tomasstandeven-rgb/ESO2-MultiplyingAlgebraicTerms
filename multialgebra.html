@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Multiplying Algebraic Expressions</title>
+
+  <style>
+    :root {
+      --top-bar-bg: #34495e;
+      --bottom-bar-bg: #2c3e50;
+      --page-bg: #f7f4e9;
+
+      --card-bg: #ffffff;
+      --card-border: #1f7ed0;
+
+      --text-main: #1f2933;
+      --text-muted: #ecf0f1;
+
+      --pill-blue: #3498db;
+      --pill-green: #27ae60;
+      --pill-red: #e74c3c;
+      --pill-purple: #8e44ad;
+      --pill-yellow: #f1c40f;
+
+      --toolbar-icon-bg: #f1c40f;
+      --toolbar-icon-border: #e0a708;
+
+      --shadow-soft: 0 6px 18px rgba(0, 0, 0, 0.12);
+      --radius-card: 18px;
+      --radius-pill: 999px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--page-bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* TOP BAR */
+    .top-bar {
+      background: var(--top-bar-bg);
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 24px;
+      font-size: 14px;
+    }
+    .top-left { display: flex; flex-direction: column; gap: 6px; }
+    .meta-row { display: flex; align-items: baseline; gap: 6px; }
+    .meta-label { font-weight: 600; opacity: 0.9; }
+    .meta-value {
+      border-bottom: 2px solid rgba(236, 240, 241, 0.7);
+      padding-bottom: 2px;
+      font-weight: 500;
+    }
+    .top-right { display: flex; align-items: center; gap: 18px; font-weight: 500; }
+    .page-info { white-space: nowrap; }
+
+    .slide-select-wrapper { position: relative; }
+    .slide-select {
+      padding: 6px 28px 6px 10px;
+      border-radius: 6px;
+      border: none;
+      font-size: 13px;
+      font-weight: 500;
+      outline: none;
+      background: #ffffff;
+      color: #333;
+      appearance: none;
+    }
+    .slide-select-wrapper::after {
+      content: "▾";
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 10px;
+      pointer-events: none;
+      color: #555;
+    }
+
+    /* MAIN */
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 40px 24px 40px;
+      gap: 18px;
+      position: relative;
+    }
+
+    /* Rounded boxes (cards) */
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      border: 3px solid var(--card-border);
+      box-shadow: var(--shadow-soft);
+      max-width: 900px;
+      width: 100%;
+      padding: 26px 34px 30px;
+    }
+
+    .card h1 {
+      font-size: 30px;
+      margin-bottom: 12px;
+      font-weight: 800;
+      color: #2c3e50;
+    }
+
+    .card p { font-size: 18px; line-height: 1.6; }
+
+    /* Example box is separate + smaller text */
+    .example-card p { font-size: 16px; line-height: 1.55; }
+
+    .bullets {
+      margin-top: 8px;
+      padding-left: 18px;
+      font-size: 18px;
+      line-height: 1.6;
+    }
+    .bullets li { margin: 6px 0; }
+
+    /* Serif math look */
+    .math { font-size: 52px; line-height: 1.25; }
+    .math i { font-style: italic; }
+    .math sup { font-size: 60%; vertical-align: super; }
+
+    .equation-line {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      margin: 22px 0;
+    }
+
+    .q-label {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: #2c3e50;
+      width: 44px;
+      text-align: right;
+      flex: 0 0 auto;
+    }
+
+    /* Two-column question grid (USED ONLY for mini-whiteboard slides now) */
+    .questions-grid {
+      max-width: 900px;
+      width: 100%;
+      padding: 0 34px;
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 120px;
+      row-gap: 160px;
+      justify-items: start;
+    }
+
+    .q-block {
+      font-family: "Times New Roman", Times, serif;
+      font-size: 52px;
+      line-height: 1.25;
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+    }
+
+    /* ============================================================
+       NEW: Row layouts for non-whiteboard slides (2 rows or 4 rows)
+       - Keeps existing styling (same fonts/sizes), only changes layout.
+       - Answers are NOT on the right. If present, they appear UNDER the question.
+    ============================================================ */
+    .questions-rows {
+      max-width: 900px;
+      width: 100%;
+      padding: 0 34px;
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 70px; /* similar to your previous spacing */
+    }
+
+    .q-row {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+    }
+
+    .q-content {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .q-main {
+      font-family: "Times New Roman", Times, serif;
+      font-size: 52px;
+      line-height: 1.25;
+    }
+
+    .q-sub {
+      font-family: "Times New Roman", Times, serif;
+      font-size: 34px;
+      line-height: 1.25;
+    }
+
+    .q-row.placeholder { opacity: 0; pointer-events: none; }
+
+    /* REVIEW SLIDE (orange title + blue boxes + green task) */
+    .review-slide {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      margin-top: 6px;
+    }
+
+    .review-title {
+      border: 3px solid #f59e0b;
+      background: #fff7ed;
+      color: #c2410c;
+      font-size: 26px;
+      font-weight: 900;
+      padding: 14px 18px;
+      border-radius: 12px;
+      box-shadow: var(--shadow-soft);
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .review-box {
+      border: 3px solid #3b82f6;
+      background: #ffffff;
+      padding: 16px 18px;
+      border-radius: 12px;
+      font-size: 18px;
+      line-height: 1.5;
+      box-shadow: var(--shadow-soft);
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .review-box strong { font-weight: 900; }
+
+    /* Final slide rule: examples centred INSIDE boxes */
+    .review-example {
+      margin-top: 8px;
+      text-align: center;
+      font-family: "Times New Roman", Times, serif;
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .apply-task {
+      border: 3px solid #16a34a;
+      background: #ecfdf5;
+      padding: 20px 18px;
+      border-radius: 14px;
+      box-shadow: var(--shadow-soft);
+      width: 100%;
+      max-width: 900px;
+      text-align: center;
+    }
+    .apply-task h2 {
+      color: #166534;
+      font-size: 32px;
+      margin-bottom: 8px;
+      font-weight: 900;
+    }
+    .apply-task p {
+      font-size: 20px;
+      color: #14532d;
+      font-weight: 700;
+    }
+
+    /* TIMER (draggable) */
+    .timer-widget {
+      position: absolute;
+      left: 24px;
+      top: 110px;
+      width: 260px;
+      background: #111;
+      color: #fff;
+      border-radius: 14px;
+      padding: 18px 16px 16px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.18);
+      border: 3px solid #0ea5e9;
+      user-select: none;
+      z-index: 5;
+      cursor: grab;
+    }
+    .timer-widget:active { cursor: grabbing; }
+
+    .timer-display {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 48px;
+      letter-spacing: 2px;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    .timer-controls {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+    .timer-btn {
+      background: #2d9cdb;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    }
+    .timer-btn:active { transform: translateY(1px); }
+    .timer-inputs {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-weight: 700;
+    }
+    .timer-inputs label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+    }
+    .timer-inputs input {
+      width: 56px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 2px solid rgba(255,255,255,0.25);
+      outline: none;
+      font-weight: 800;
+      text-align: center;
+      background: #fff;
+      color: #111;
+    }
+
+    /* Canvas overlay */
+    #drawCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .hidden { display: none; }
+
+    /* BOTTOM TOOLBAR */
+    .toolbar {
+      background: var(--bottom-bar-bg);
+      color: var(--text-muted);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      flex-wrap: wrap;
+    }
+    .toolbar-left, .toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .tool-button, .pill-button {
+      border: none;
+      outline: none;
+      cursor: pointer;
+      font: inherit;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+    }
+    .tool-button {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: #1f4b6f;
+      color: #ecf0f1;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+    }
+    .tool-button.square-active {
+      width: 40px;
+      border-radius: 12px;
+      background: var(--toolbar-icon-bg);
+      color: #2c3e50;
+      border: 2px solid var(--toolbar-icon-border);
+      font-size: 18px;
+    }
+    .tool-button.circle { border-radius: 50%; }
+    .tool-button.disabled { opacity: 0.4; cursor: default; pointer-events: none; }
+    .tool-button.active { box-shadow: 0 0 0 2px #f1c40f, 0 2px 6px rgba(0,0,0,0.35); }
+
+    .pill-button {
+      padding: 7px 14px;
+      border-radius: var(--radius-pill);
+      font-weight: 700;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+    }
+    .pill-blue { background: var(--pill-blue); color: #ecf0f1; }
+    .pill-red { background: var(--pill-red); color: #ffffff; }
+    .pill-purple { background: var(--pill-purple); color: #ecf0f1; }
+    .pill-green { background: var(--pill-green); color: #ecf0f1; }
+    .toolbar-spacer { flex: 1; }
+
+    /* Makes ONLY the long answer wrap nicely */
+    .wrap-ans{
+      display: inline-block;
+      max-width: 540px;   /* adjust this number */
+      vertical-align: top;
+      }
+
+    @media (max-width: 900px) {
+      .timer-widget {
+        position: static;
+        width: 100%;
+        max-width: 360px;
+        margin-bottom: 14px;
+        cursor: default;
+      }
+      .questions-grid {
+        grid-template-columns: 1fr;
+        row-gap: 70px;
+        column-gap: 0;
+      }
+      .math, .q-block { font-size: 42px; }
+      .q-main { font-size: 42px; }
+      .q-sub { font-size: 30px; }
+    }
+
+      /* Only for slide 15: zoom out + remove excess bottom space */
+      .slide15-zoom {
+        transform: scale(0.8);
+        transform-origin: top center;
+        width: 125%;
+
+        /* THIS fixes the gap above the toolbar */
+        margin-top: -30px;
+        margin-bottom: -240px;
+      }
+
+
+
+  </style>
+
+  <script>
+  window.MathJax = {
+    tex: { inlineMath: [['\\(','\\)'], ['$', '$']] }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+</head>
+
+<body>
+  <header class="top-bar">
+    <div class="top-left">
+      <div class="meta-row">
+        <span class="meta-label">Date:</span>
+        <span class="meta-value">21/12/2025</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">Title:</span>
+        <span class="meta-value">Multiplying Algebraic Expressions</span>
+      </div>
+    </div>
+
+    <div class="top-right">
+      <span class="page-info" id="pageInfo">Slide 1 of 15</span>
+      <div class="slide-select-wrapper">
+        <select class="slide-select" id="slideSelect"></select>
+      </div>
+    </div>
+  </header>
+
+  <main class="content">
+    <div id="timerWidget" class="timer-widget hidden">
+      <div id="timerDisplay" class="timer-display">01:00</div>
+      <div class="timer-controls">
+        <button id="timerStart" class="timer-btn">Start</button>
+        <button id="timerPause" class="timer-btn">Pause</button>
+        <button id="timerReset" class="timer-btn">Reset</button>
+      </div>
+      <div class="timer-inputs">
+        <label>Min: <input id="timerMin" type="number" min="0" max="999" value="1"></label>
+        <label>Sec: <input id="timerSec" type="number" min="0" max="59" value="0"></label>
+      </div>
+    </div>
+
+    <div id="slideMount" style="width:100%; display:flex; flex-direction:column; align-items:center; gap:18px;"></div>
+
+    <canvas id="drawCanvas"></canvas>
+  </main>
+
+  <footer class="toolbar">
+    <div class="toolbar-left">
+      <button id="fullscreenBtn" class="tool-button square-active">⤢</button>
+      <button id="prevBtn" class="tool-button disabled">←</button>
+      <button id="nextBtn" class="tool-button">→</button>
+
+      <button id="penBtn" class="tool-button circle">✏️</button>
+      <button id="greenBtn" class="tool-button circle">🟢</button>
+      <button id="redBtn" class="tool-button circle">🔴</button>
+      <button id="eraserBtn" class="tool-button circle">⚪</button>
+
+      <button id="penSizeBtn" class="pill-button pill-blue">Pen size: Medium ▾</button>
+      <button id="eraserSizeBtn" class="pill-button pill-blue">Eraser size: Medium ▾</button>
+      <button id="clearBtn" class="pill-button pill-red">Clear</button>
+    </div>
+
+    <div class="toolbar-spacer"></div>
+
+    <div class="toolbar-right">
+      <button class="pill-button pill-purple">Animations: On</button>
+      <button class="pill-button pill-purple">Timers: On</button>
+      <button class="pill-button pill-green"><span class="icon">🖨</span>Print</button>
+    </div>
+  </footer>
+
+  <script>
+    const slideMount = document.getElementById('slideMount');
+    const slideSelect = document.getElementById('slideSelect');
+    const pageInfo = document.getElementById('pageInfo');
+
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    const timerWidget = document.getElementById('timerWidget');
+    const timerDisplay = document.getElementById('timerDisplay');
+    const timerStartBtn = document.getElementById('timerStart');
+    const timerPauseBtn = document.getElementById('timerPause');
+    const timerResetBtn = document.getElementById('timerReset');
+    const timerMinInput = document.getElementById('timerMin');
+    const timerSecInput = document.getElementById('timerSec');
+
+    /* ============================================================
+      NEW: Layout helpers
+      - Mini-whiteboard slides: 2×2 grid (questions-grid)
+      - Other slides: rows (2 rows or 4 rows) with any answers UNDER (not right)
+    ============================================================ */
+
+    // items: [{ label:"a)", mainHtml:"...", subs?: [ "...", "..." ], placeholder?:true }]
+    function renderRowQuestions(items, opts = { forceCount: null }) {
+      const rows = [...items];
+
+      if (typeof opts.forceCount === "number") {
+        while (rows.length < opts.forceCount) rows.push({ label: "", mainHtml: "", subs: [], placeholder: true });
+        if (rows.length > opts.forceCount) rows.length = opts.forceCount;
+      }
+
+      return `
+        <section class="questions-rows">
+          ${rows.map(r => `
+            <div class="q-row ${r.placeholder ? "placeholder" : ""}">
+              <span class="q-label">${r.label || ""}</span>
+              <div class="q-content">
+                <div class="q-main"><span class="math">${r.mainHtml || ""}</span></div>
+                ${(r.subs || []).map(s => `
+                  <div class="q-sub"><span class="math" style="font-size:34px;">${s}</span></div>
+                `).join("")}
+              </div>
+            </div>
+          `).join("")}
+        </section>
+      `;
+    }
+
+    // items: [{ label:"a)", exprHtml:"..." }] -> always first 4 (2×2)
+    function renderMiniWhiteboard(items) {
+      const first4 = items.slice(0, 4);
+      return `
+        <section class="questions-grid">
+          ${first4.map(r => `
+            <div class="q-block">
+              <span class="q-label">${r.label}</span>
+              <span class="math">${r.exprHtml}</span>
+            </div>
+          `).join("")}
+        </section>
+      `;
+    }
+
+    /* ============================================================
+  SLIDES (content unchanged; ONLY question layout changed)
+============================================================ */
+const slides = [
+  // 1
+  {
+    timer: null,
+    render: () => `
+      <section class="card">
+        <h1>Core Knowledge: Multiplying Terms</h1>
+        <p><strong>When multiplying algebraic terms:</strong></p>
+        <ul class="bullets">
+          <li>The multiplication symbol (×) is not written.</li>
+          <li>The number (coefficient) is written first.</li>
+          <li>Letters are written in alphabetical order.</li>
+        </ul>
+      </section>
+
+      <section class="card example-card">
+        <h1>Example</h1>
+        <p>Rewrite each multiplication as a single term, following the rules above.</p>
+      </section>
+
+      ${renderRowQuestions(
+        [
+          { label: "a)", mainHtml: `\\(5 \\times a\\) = <span class="inline-ans">\\(5a\\)</span>` },
+          { label: "b)", mainHtml: `\\(c \\times a \\times b\\) = <span class="inline-ans">\\(abc\\)</span>` }
+        ],
+        { forceCount: 2 }
+      )}
+    `
+  },
+
+  // 2 (4 rows)
+  {
+    timer: null,
+    render: () => `
+      <section class="card example-card">
+        <h1>Examples</h1>
+        <p>Simplify the following expressions by writing them as a single term.</p>
+      </section>
+
+      ${renderRowQuestions(
+        [
+          { label: "a)", mainHtml: `\\(7 \\times x\\)` },
+          { label: "b)", mainHtml: `\\(b \\times 4\\)` },
+          { label: "c)", mainHtml: `\\(m \\times a \\times c\\)` },
+          { label: "d)", mainHtml: `\\(q \\times 9 \\times p\\)` }
+        ],
+        { forceCount: 4 }
+      )}
+    `
+  },
+
+  // 3 (Mini-whiteboard 2×2)
+  {
+    timer: { min: 1, sec: 0 },
+    render: () => `
+      <section class="card example-card">
+        <h1>Question 1</h1>
+        <p><strong>On your whiteboards, simplify the following expressions:</strong></p>
+      </section>
+
+      ${renderMiniWhiteboard([
+        { label: "a)", exprHtml: `\\(6 \\times y\\)` },
+        { label: "b)", exprHtml: `\\(d \\times 5\\)` },
+        { label: "c)", exprHtml: `\\(n \\times k \\times a\\)` },
+        { label: "d)", exprHtml: `\\(t \\times 8 \\times r\\)` }
+      ])}
+    `
+  },
+
+  // 4 (2 rows, with answers UNDER)
+  {
+    timer: null,
+    render: () => `
+      <section class="card">
+        <h1>Core Knowledge: Laws of Indices</h1>
+        <p>
+          When multiplying powers with the same base, you add the indices.
+          If the bases are different, the expression cannot be written as a single power.
+        </p>
+      </section>
+
+      <section class="card example-card">
+        <h1>Example</h1>
+        <p>Write the following as a single power.</p>
+      </section>
+
+      ${renderRowQuestions(
+        [
+          {
+            label: "",
+            mainHtml: `\\(x^5 \\times x^7\\) = <span class="inline-ans">\\(x^{12}\\)</span>`
+          },
+          {
+            label: "",
+            mainHtml: `\\(y^2 \\times x^5\\) = <span class="inline-ans wrap-ans">cannot be written as a single power</span>`
+
+          }
+        ],
+        { forceCount: 2 }
+      )}
+    `
+  },
+
+  // 5 (4 rows)
+  {
+    timer: null,
+    render: () => `
+      <section class="card example-card">
+        <h1>Examples</h1>
+        <p>Simplify the following expressions.</p>
+      </section>
+
+      ${renderRowQuestions(
+        [
+          { label: "a)", mainHtml: `\\(x^3 \\times x^4\\)` },
+          { label: "b)", mainHtml: `\\(xy^2 \\times 10y^3\\)` },
+          { label: "c)", mainHtml: `\\(4a^2 \\times 3a^4\\)` },
+          { label: "d)", mainHtml: `\\(6m^3 \\times 2n^2\\)` }
+        ],
+        { forceCount: 4 }
+      )}
+    `
+  },
+
+  // 6 (Mini-whiteboard 2×2)
+  {
+    timer: { min: 1, sec: 0 },
+    render: () => `
+      <section class="card example-card">
+        <h1>Question 2</h1>
+        <p><strong>On your whiteboards, simplify the following expressions:</strong></p>
+      </section>
+
+      ${renderMiniWhiteboard([
+        { label: "a)", exprHtml: `\\(2x^5 \\times x^3\\)` },
+        { label: "b)", exprHtml: `\\(5xy^2 \\times 4xy^3\\)` },
+        { label: "c)", exprHtml: `\\(3a^4 \\times 2b^2\\)` },
+        { label: "d)", exprHtml: `\\(5m^2 \\times 6mn\\)` }
+      ])}
+    `
+  },
+
+  // 7 (1 row, with working/notes UNDER)
+  {
+    timer: null,
+    render: () => `
+      <section class="card">
+        <h1>Core Knowledge: Expanding One Bracket</h1>
+        <p>
+          To expand a bracket with one term outside, multiply every term inside the bracket by the term outside.
+          This is the distributive law.
+        </p>
+      </section>
+
+      <section class="card example-card">
+        <h1>Example</h1>
+        <p>Multiply the term outside the bracket by each term inside the bracket.</p>
+      </section>
+
+      ${renderRowQuestions(
+        [
+          {
+            label: "",
+            mainHtml: `\\(5(2x + 4)\\) = <span class="inline-ans">\\(10x + 20\\)</span> <span style="margin-left:20px;">✔ correct</span>`
+          },
+          {
+            label: "",
+            mainHtml: `\\(5(2x + 4)\\) = <span class="inline-ans">\\(10x + 4\\)</span> <span style="margin-left:20px;">✘ incorrect</span>`
+          }
+        ],
+        { forceCount: 2 }
+      )}
+    `
+  },
+
+  // 8 (4 rows; last blank placeholder kept)
+  {
+    timer: null,
+    render: () => `
+      <section class="card example-card">
+        <h1>Examples</h1>
+        <p>Expand and simplify.</p>
+      </section>
+
+      ${renderRowQuestions(
+        [
+          { label: "a)", mainHtml: `\\(3(4x + 7)\\)` },
+          { label: "b)", mainHtml: `\\(6(2y - 5)\\)` },
+          { label: "c)", mainHtml: `\\(4(3a + 2b)\\)` },
+          { label: "", mainHtml: `` , placeholder: true }
+        ],
+        { forceCount: 4 }
+      )}
+    `
+  },
+
+  // 9 (Mini-whiteboard 2×2)
+  {
+    timer: { min: 1, sec: 0 },
+    render: () => `
+      <section class="card example-card">
+        <h1>Question 3</h1>
+        <p><strong>On your whiteboards, expand the following expressions:</strong></p>
+      </section>
+
+      ${renderMiniWhiteboard([
+        { label: "a)", exprHtml: `\\(5(2x + 3)\\)` },
+        { label: "b)", exprHtml: `\\(7(y - 4)\\)` },
+        { label: "c)", exprHtml: `\\(3(4a + 5b)\\)` },
+        { label: "d)", exprHtml: `\\(8(2m - n)\\)` }
+      ])}
+    `
+  },
+
+  // NEW (between 9 and 10) – “unseen” expansions
+  {
+    timer: { min: 1, sec: 0 },
+    render: () => `
+      <section class="card example-card">
+        <h1>Challenge</h1>
+        <p><strong>You haven't seen questions exactly like this before, but using what you know, on your whiteboards, simplify the following:</strong></p>
+      </section>
+
+      ${renderMiniWhiteboard([
+        { label: "a)", exprHtml: `\\(5x(2x + 3)\\)` },
+        { label: "b)", exprHtml: `\\(6a^2(a^3 - 2b)\\)` },
+        { label: "c)", exprHtml: `\\(5ab(2a + 4b)\\)` },
+        { label: "d)", exprHtml: `\\(4mn(2mn - 3n)\\)` }
+      ])}
+    `
+  },
+
+  // 10 (2 rows; examples under, not right)
+  {
+    timer: null,
+    render: () => `
+      <section class="card">
+        <h1>Core Knowledge: Multiplying with Negative Terms</h1>
+        <p><strong>When multiplying with negatives:</strong></p>
+        <ul class="bullets">
+          <li>Same signs give a sum.</li>
+          <li>Different signs give a difference.</li>
+        </ul>
+        <p><strong>This applies to numbers and variables.</strong></p>
+      </section>
+
+      <section class="card example-card">
+        <h1>Example</h1>
+        <p>Decide the sign first, then multiply the numbers and variables.</p>
+      </section>
+
+      ${renderRowQuestions(
+        [
+          {
+            label: "a)",
+            mainHtml: `\\((-3) \\times (-x)\\) = <span class="inline-ans">\\(3x\\)</span>`
+          },
+          {
+            label: "b)",
+            mainHtml: `\\(4 \\times (-y)\\) = <span class="inline-ans">\\(-4y\\)</span>`
+          }
+        ],
+        { forceCount: 2 }
+      )}
+    `
+  },
+
+  // 11 (4 rows with placeholder)
+  {
+    timer: null,
+    render: () => `
+      <section class="card example-card">
+        <h1>Examples</h1>
+        <p>Expand and simplify.</p>
+      </section>
+
+      ${renderRowQuestions(
+        [
+          { label: "a)", mainHtml: `\\(-4(3x - y)\\)` },
+          { label: "b)", mainHtml: `\\(-2(5y + 3x)\\)` },
+          { label: "c)", mainHtml: `\\(-6(a - 2b)\\)` },
+          { label: "", mainHtml: `` , placeholder: true }
+        ],
+        { forceCount: 4 }
+      )}
+    `
+  },
+
+  // 12 (Mini-whiteboard 2×2)
+  {
+    timer: { min: 1, sec: 0 },
+    render: () => `
+      <section class="card example-card">
+        <h1>Question 4</h1>
+        <p><strong>On your whiteboards, expand the following expressions:</strong></p>
+      </section>
+
+      ${renderMiniWhiteboard([
+        { label: "a)", exprHtml: `\\(-5(2x - 3y)\\)` },
+        { label: "b)", exprHtml: `\\(-3(4a + b)\\)` },
+        { label: "c)", exprHtml: `\\(-7(m - 2n)\\)` },
+        { label: "d)", exprHtml: `\\(-2(3x + 5y)\\)` }
+      ])}
+    `
+  },
+
+  // 13 (2 rows)
+{
+  timer: null,
+  render: () => `
+    <section class="card">
+      <h1>Core Knowledge: Expanding Two Brackets</h1>
+      <p>
+        To expand two brackets, multiply each term in the first bracket by each term in the second bracket.
+        Then collect like terms to simplify the final expression.
+      </p>
+    </section>
+
+    <section class="card example-card">
+      <h1>Example</h1>
+      <p>Expand carefully by multiplying every term, then simplify by collecting like terms.</p>
+    </section>
+
+    ${renderRowQuestions(
+  [
+    {
+      label: "a)",
+      mainHtml: `
+        \\(
+        \\begin{aligned}[t]
+          (x + 3)(x + 4)
+          &= x^2 + 4x + 3x + 12 \\\\
+          &= x^2 + 7x + 12
+        \\end{aligned}
+        \\)
+      `
+    },
+    {
+      label: "b)",
+      mainHtml: `
+        \\(
+        \\begin{aligned}[t]
+          (2x + 1)(3x + 5)
+          &= 6x^2 + 10x + 3x + 5 \\\\
+          &= 6x^2 + 13x + 5
+        \\end{aligned}
+        \\)
+      `
+    }
+  ],
+  { forceCount: 2 }
+)}
+  `
+},
+
+  // NEW (between 14 and final recap) – questions only, spacing fixed
+  {
+    timer: null,
+    render: () => `
+      <section class="card example-card">
+        <h1>Examples</h1>
+        <p>Expand and simplify the following expressions.</p>
+      </section>
+
+      ${renderRowQuestions(
+        [
+          { label: "a)", mainHtml: `\\((2x - 3)(-5x + 4)\\)` },
+          { label: "", mainHtml: "", placeholder: true },
+          { label: "b)", mainHtml: `\\((x + 6)(-3x - 2)\\)` },
+          { label: "", mainHtml: "", placeholder: true }
+        ],
+        { forceCount: 4 }
+      )}
+    `
+  },
+
+
+  // 14 (Mini-whiteboard 2×2)
+  {
+    timer: { min: 1, sec: 0 },
+    render: () => `
+      <section class="card example-card">
+        <h1>Question 5</h1>
+        <p><strong>On your whiteboards, expand and simplify the following expressions:</strong></p>
+      </section>
+
+      ${renderMiniWhiteboard([
+        { label: "a)", exprHtml: `\\((x + 6)(4x + 3)\\)` },
+        { label: "b)", exprHtml: `\\((2y - 5)(3y + 4)\\)` },
+        { label: "c)", exprHtml: `\\((3a + 1)(2a + 7)\\)` },
+        { label: "d)", exprHtml: `\\((4m - 3)(m + 5)\\)` }
+      ])}
+    `
+  },
+
+  // 15 (Final recap unchanged)
+  {
+    timer: { min: 20, sec: 0 },
+    render: () => `
+      <div class="slide15-zoom">
+      <section class="review-slide">
+        <div class="review-title">📝 Core Knowledge Review – Write in your books:</div>
+
+        <div class="review-box">
+          <strong>Multiplying algebraic terms:</strong>
+          When multiplying terms, do not write the multiplication symbol. Write the coefficient first and the letters in alphabetical order.
+          <div class="review-example">\\(4 \\times c \\times a = 4ac\\)</div>
+        </div>
+
+        <div class="review-box">
+          <strong>Laws of indices:</strong>
+          When multiplying powers with the same base, add the indices.
+          <div class="review-example">\\(x^3 \\times x^5 = x^8\\)</div>
+        </div>
+
+        <div class="review-box">
+          <strong>Multiplying with negative terms:</strong>
+          Same signs give a sum. Different signs give a difference.
+          <div class="review-example">\\((-2)(-x)=2x\\) , &nbsp;&nbsp; \\(3(-y)=-3y\\)</div>
+        </div>
+
+        <div class="review-box">
+          <strong>Expanding one bracket:</strong>
+          Multiply every term inside the bracket by the term outside.
+          <div class="review-example">\\(-4(2x-y) = -8x + 4y\\)</div>
+        </div>
+
+        <div class="review-box">
+          <strong>Expanding two brackets:</strong>
+          Multiply each term in the first bracket by each term in the second bracket, then collect like terms.
+          <div class="review-example">\\((2x+5)(3x+4)=6x^2+8x+15x+20=6x^2+23x+20\\)</div>
+        </div>
+
+        <div class="apply-task">
+          <h2>Independent Apply Task</h2>
+          <p>Complete all questions on the worksheet, showing all working clearly.</p>
+        </div>
+      </section>
+      </div>
+    `
+  }
+];
+
+
+    const maxSlide = slides.length - 1;
+    let currentSlide = 0;
+
+    function buildDropdown() {
+      slideSelect.innerHTML = "";
+      slides.forEach((_, i) => {
+        const opt = document.createElement("option");
+        opt.value = String(i);
+        opt.textContent = `Slide ${i + 1}`;
+        slideSelect.appendChild(opt);
+      });
+    }
+    buildDropdown();
+
+    function updateNavUI() {
+      prevBtn.classList.toggle('disabled', currentSlide === 0);
+      nextBtn.classList.toggle('disabled', currentSlide === maxSlide);
+      pageInfo.textContent = `Slide ${currentSlide + 1} of ${maxSlide + 1}`;
+      slideSelect.value = String(currentSlide);
+    }
+
+    function renderSlide() {
+      const t = slides[currentSlide].timer;
+      if (t) {
+        timerWidget.classList.remove('hidden');
+        setTimerTo(t.min, t.sec);
+      } else {
+        timerWidget.classList.add('hidden');
+        pauseTimer();
+      }
+
+      slideMount.innerHTML = slides[currentSlide].render();
+      if (window.MathJax?.typesetPromise) MathJax.typesetPromise();
+      updateNavUI();
+      resizeCanvas();
+      restoreDrawingForSlide(currentSlide);
+    }
+
+    function changeSlideTo(target) {
+      if (target < 0 || target > maxSlide) return;
+      saveCurrentSlideDrawing();
+      currentSlide = target;
+      renderSlide();
+    }
+
+    prevBtn.addEventListener('click', () => changeSlideTo(currentSlide - 1));
+    nextBtn.addEventListener('click', () => changeSlideTo(currentSlide + 1));
+    slideSelect.addEventListener('change', (e) => changeSlideTo(parseInt(e.target.value, 10) || 0));
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') { e.preventDefault(); changeSlideTo(currentSlide - 1); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); changeSlideTo(currentSlide + 1); }
+    });
+
+    /* ============================================================
+      DRAWING SYSTEM (per-slide persistence)
+    ============================================================ */
+    const canvas = document.getElementById('drawCanvas');
+    const contentEl = document.querySelector('.content');
+    const ctx = canvas.getContext('2d');
+
+    const penBtn = document.getElementById('penBtn');
+    const greenBtn = document.getElementById('greenBtn');
+    const redBtn = document.getElementById('redBtn');
+    const eraserBtn = document.getElementById('eraserBtn');
+
+    const penSizeBtn = document.getElementById('penSizeBtn');
+    const eraserSizeBtn = document.getElementById('eraserSizeBtn');
+    const clearBtn = document.getElementById('clearBtn');
+
+    let drawingEnabled = false;
+    let isDrawing = false;
+    let currentTool = 'pen';
+    let currentColor = '#111111';
+
+    const slideDrawings = new Array(slides.length).fill(null);
+
+    const penSizes = [
+      { label: 'Small', value: 2 },
+      { label: 'Medium', value: 4 },
+      { label: 'Large', value: 8 }
+    ];
+    const eraserSizes = [
+      { label: 'Small', value: 10 },
+      { label: 'Medium', value: 20 },
+      { label: 'Large', value: 40 }
+    ];
+    let penSizeIndex = 1;
+    let eraserSizeIndex = 1;
+
+    function currentPenSize() { return penSizes[penSizeIndex].value; }
+    function currentEraserSize() { return eraserSizes[eraserSizeIndex].value; }
+
+    function updateSizeLabels() {
+      penSizeBtn.textContent = `Pen size: ${penSizes[penSizeIndex].label} ▾`;
+      eraserSizeBtn.textContent = `Eraser size: ${eraserSizes[eraserSizeIndex].label} ▾`;
+    }
+    updateSizeLabels();
+
+    function enableDrawing(enable) {
+      drawingEnabled = enable;
+      canvas.style.pointerEvents = enable ? 'auto' : 'none';
+    }
+
+    function setActiveToolButton(btn) {
+      [penBtn, greenBtn, redBtn, eraserBtn].forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+    }
+
+    penBtn.addEventListener('click', () => {
+      currentTool = 'pen';
+      currentColor = '#111111';
+      enableDrawing(true);
+      setActiveToolButton(penBtn);
+    });
+
+    greenBtn.addEventListener('click', () => {
+      currentTool = 'pen';
+      currentColor = '#2ecc71';
+      enableDrawing(true);
+      setActiveToolButton(greenBtn);
+    });
+
+    redBtn.addEventListener('click', () => {
+      currentTool = 'pen';
+      currentColor = '#e74c3c';
+      enableDrawing(true);
+      setActiveToolButton(redBtn);
+    });
+
+    eraserBtn.addEventListener('click', () => {
+      currentTool = 'eraser';
+      enableDrawing(true);
+      setActiveToolButton(eraserBtn);
+    });
+
+    penSizeBtn.addEventListener('click', () => {
+      penSizeIndex = (penSizeIndex + 1) % penSizes.length;
+      updateSizeLabels();
+    });
+
+    eraserSizeBtn.addEventListener('click', () => {
+      eraserSizeIndex = (eraserSizeIndex + 1) % eraserSizes.length;
+      updateSizeLabels();
+    });
+
+    clearBtn.addEventListener('click', () => {
+      clearCanvas();
+      slideDrawings[currentSlide] = null;
+    });
+
+    function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+    function saveCurrentSlideDrawing() {
+      slideDrawings[currentSlide] = canvas.toDataURL('image/png');
+    }
+
+    function restoreDrawingForSlide(index) {
+      ctx.globalCompositeOperation = 'source-over';
+      clearCanvas();
+      const dataUrl = slideDrawings[index];
+      if (!dataUrl) return;
+      const img = new Image();
+      img.onload = () => {
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      };
+      img.src = dataUrl;
+    }
+
+    function resizeCanvas() {
+      const rect = contentEl.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+      restoreDrawingForSlide(currentSlide);
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    function startDraw(x, y) {
+      if (!drawingEnabled) return;
+      isDrawing = true;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+    }
+
+    function drawLine(x, y) {
+      if (!isDrawing) return;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      if (currentTool === 'eraser') {
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.lineWidth = currentEraserSize();
+      } else {
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.strokeStyle = currentColor;
+        ctx.lineWidth = currentPenSize();
+      }
+      ctx.lineTo(x, y);
+      ctx.stroke();
+    }
+
+    function stopDraw() {
+      if (!isDrawing) return;
+      isDrawing = false;
+      ctx.closePath();
+      saveCurrentSlideDrawing();
+    }
+
+    canvas.addEventListener('mousedown', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      startDraw(e.clientX - rect.left, e.clientY - rect.top);
+    });
+    canvas.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      drawLine(e.clientX - rect.left, e.clientY - rect.top);
+    });
+    canvas.addEventListener('mouseup', stopDraw);
+    canvas.addEventListener('mouseleave', stopDraw);
+
+    canvas.addEventListener('touchstart', (e) => {
+      const touch = e.touches[0];
+      const rect = canvas.getBoundingClientRect();
+      startDraw(touch.clientX - rect.left, touch.clientY - rect.top);
+      e.preventDefault();
+    }, { passive: false });
+
+    canvas.addEventListener('touchmove', (e) => {
+      const touch = e.touches[0];
+      const rect = canvas.getBoundingClientRect();
+      drawLine(touch.clientX - rect.left, touch.clientY - rect.top);
+      e.preventDefault();
+    }, { passive: false });
+
+    canvas.addEventListener('touchend', stopDraw);
+    canvas.addEventListener('touchcancel', stopDraw);
+
+    /* ============================================================
+      TIMER SYSTEM
+    ============================================================ */
+    let timerInterval = null;
+    let timerRemainingSeconds = 60;
+    let timerSetSeconds = 60;
+
+    function clamp(num, min, max) { return Math.min(max, Math.max(min, num)); }
+    function pad2(n) { return String(n).padStart(2, '0'); }
+
+    function renderTimer() {
+      const m = Math.floor(timerRemainingSeconds / 60);
+      const s = timerRemainingSeconds % 60;
+      timerDisplay.textContent = `${pad2(m)}:${pad2(s)}`;
+    }
+
+    function readInputsAsSeconds() {
+      const min = clamp(parseInt(timerMinInput.value, 10) || 0, 0, 999);
+      const sec = clamp(parseInt(timerSecInput.value, 10) || 0, 0, 59);
+      timerMinInput.value = String(min);
+      timerSecInput.value = String(sec);
+      return (min * 60) + sec;
+    }
+
+    function stopTimerInterval() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+    }
+
+    function startTimer() {
+      const inputSeconds = readInputsAsSeconds();
+      const shouldUseInputs =
+        timerRemainingSeconds === 0 ||
+        timerRemainingSeconds === timerSetSeconds;
+
+      if (shouldUseInputs) {
+        timerSetSeconds = inputSeconds || 0;
+        timerRemainingSeconds = timerSetSeconds;
+      }
+
+      stopTimerInterval();
+      timerInterval = setInterval(() => {
+        if (timerRemainingSeconds > 0) {
+          timerRemainingSeconds -= 1;
+          renderTimer();
+        } else {
+          stopTimerInterval();
+        }
+      }, 1000);
+
+      renderTimer();
+    }
+
+    function pauseTimer() { stopTimerInterval(); }
+
+    function resetTimer() {
+      stopTimerInterval();
+      timerRemainingSeconds = timerSetSeconds;
+      timerMinInput.value = String(Math.floor(timerSetSeconds / 60));
+      timerSecInput.value = String(timerSetSeconds % 60);
+      renderTimer();
+    }
+
+    function setTimerTo(min, sec) {
+      stopTimerInterval();
+      min = clamp(parseInt(min, 10) || 0, 0, 999);
+      sec = clamp(parseInt(sec, 10) || 0, 0, 59);
+
+      timerMinInput.value = String(min);
+      timerSecInput.value = String(sec);
+
+      timerSetSeconds = (min * 60) + sec;
+      timerRemainingSeconds = timerSetSeconds;
+      renderTimer();
+    }
+
+    timerStartBtn.addEventListener('click', startTimer);
+    timerPauseBtn.addEventListener('click', pauseTimer);
+    timerResetBtn.addEventListener('click', resetTimer);
+
+    function onInputsChanged() {
+      const secs = readInputsAsSeconds();
+      timerSetSeconds = secs;
+      if (!timerInterval) {
+        timerRemainingSeconds = timerSetSeconds;
+        renderTimer();
+      }
+    }
+    timerMinInput.addEventListener('input', onInputsChanged);
+    timerSecInput.addEventListener('input', onInputsChanged);
+    timerMinInput.addEventListener('change', onInputsChanged);
+    timerSecInput.addEventListener('change', onInputsChanged);
+
+    renderTimer();
+
+    /* ============================================================
+      DRAG TIMER + SAVE POSITION
+    ============================================================ */
+    const TIMER_POS_KEY = 'timerWidgetPosition_v3';
+
+    function loadTimerPosition() {
+      try {
+        const raw = localStorage.getItem(TIMER_POS_KEY);
+        if (!raw) return;
+        const pos = JSON.parse(raw);
+        if (typeof pos?.left !== 'number' || typeof pos?.top !== 'number') return;
+        timerWidget.style.left = `${pos.left}px`;
+        timerWidget.style.top = `${pos.top}px`;
+      } catch {}
+    }
+
+    function saveTimerPosition(left, top) {
+      localStorage.setItem(TIMER_POS_KEY, JSON.stringify({ left, top }));
+    }
+
+    function makeDraggableAbsolute(el, onSave) {
+      let dragging = false;
+      let offsetX = 0;
+      let offsetY = 0;
+
+      el.addEventListener('mousedown', (e) => {
+        const tag = e.target.tagName.toLowerCase();
+        if (tag === 'input' || tag === 'button') return;
+
+        dragging = true;
+        const rect = el.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+        e.preventDefault();
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!dragging) return;
+        const parentRect = contentEl.getBoundingClientRect();
+
+        let left = e.clientX - parentRect.left - offsetX;
+        let top = e.clientY - parentRect.top - offsetY;
+
+        left = clamp(left, 0, parentRect.width - el.offsetWidth);
+        top = clamp(top, 0, parentRect.height - el.offsetHeight);
+
+        el.style.left = `${left}px`;
+        el.style.top = `${top}px`;
+      });
+
+      window.addEventListener('mouseup', () => {
+        if (!dragging) return;
+        dragging = false;
+        const left = parseFloat(el.style.left) || 0;
+        const top = parseFloat(el.style.top) || 0;
+        if (onSave) onSave(left, top);
+      });
+    }
+
+    loadTimerPosition();
+    makeDraggableAbsolute(timerWidget, saveTimerPosition);
+
+    /* INIT */
+    renderSlide();
+  </script>
+</body>
+</html>
